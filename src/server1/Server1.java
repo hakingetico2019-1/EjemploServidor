@@ -39,23 +39,25 @@ public class Server1 {
         Socket socketCliente = null;
         BufferedReader entrada = null;
         PrintWriter salida = null;
-
+        BufferedReader entradaAdmin = null;
         System.out.println("Escuchando: " + socketServidor);
         try {
-            // Se bloquea hasta que recibe alguna petición de un cliente
-            // abriendo un socket para el cliente
             socketCliente = socketServidor.accept();
             System.out.println("Connexión acceptada: " + socketCliente);
-            // Establece canal de entrada
+            
+            entradaAdmin = new BufferedReader(new InputStreamReader(socketCliente.getInputStream())); // Obtenemos el canal de salida
             entrada = new BufferedReader(new InputStreamReader(socketCliente.getInputStream()));
-            // Establece canal de salida
             salida = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socketCliente.getOutputStream())), true);
-
-            // Hace eco de lo que le proporciona el cliente, hasta que recibe "Adios"
+            //
+            BufferedReader inServer
+                = new BufferedReader(new InputStreamReader(System.in));   
+            String linea;
             while (true) {
+                sendMsgsToRandomClients();
                 String str = entrada.readLine();
                 System.out.println("Cliente: " + str);
                 salida.println(str);
+                //Añadiendo
                 if (str.equals("Adios")) {
                     break;
                 }
@@ -64,6 +66,7 @@ public class Server1 {
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
         }
+        //sendMsgsToRandomClients();
         salida.close();
         entrada.close();
         socketCliente.close();
@@ -74,6 +77,7 @@ public class Server1 {
      * This method sends messages to a random outPutStream
      */
     private static void sendMsgsToRandomClients() {
+        System.out.println("entramos");
         new Thread("Send-to-Clients") {
             public void run() {
                 try {
@@ -113,5 +117,4 @@ public class Server1 {
             }
         }.start();
     }
-
 }
