@@ -35,7 +35,6 @@ public class Server1 {
             System.out.println("No puede escuchar en el puerto: " + PORT);
             System.exit(-1);
         }
-
         Socket socketCliente = null;
         BufferedReader entrada = null;
         PrintWriter salida = null;
@@ -49,11 +48,11 @@ public class Server1 {
             entrada = new BufferedReader(new InputStreamReader(socketCliente.getInputStream()));
             salida = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socketCliente.getOutputStream())), true);
             //
+            
             BufferedReader inServer
                 = new BufferedReader(new InputStreamReader(System.in));   
             String linea;
             while (true) {
-                sendMsgsToRandomClients();
                 String str = entrada.readLine();
                 System.out.println("Cliente: " + str);
                 salida.println(str);
@@ -62,6 +61,7 @@ public class Server1 {
                     break;
                 }
             }
+            
 
         } catch (IOException e) {
             System.out.println("IOException: " + e.getMessage());
@@ -76,45 +76,4 @@ public class Server1 {
     /**
      * This method sends messages to a random outPutStream
      */
-    private static void sendMsgsToRandomClients() {
-        System.out.println("entramos");
-        new Thread("Send-to-Clients") {
-            public void run() {
-                try {
-                    boolean showInfo = true;
-                    while (true) {
-                        Random generator = new Random();
-                        for (; chm.size() > 0; msg++) {
-                            //gets a random Key from the list
-                            String randomKey = new ArrayList<String>(
-                                    chm.keySet()).get(generator.nextInt(chm
-                                    .keySet().size()));
-                            ThreadCliHandler cc = chm.get(randomKey);
-                            //sends the message
-                            if (!cc.socket.isClosed()) {
-                                cc.out.println("From server to client "
-                                        + randomKey + " MSG sent: " + msg + "\r");
-                                cc.out.flush();
-                            } else {
-                                chm.remove(randomKey);
-                            }
-                            Thread.sleep(PAUSE_BETWEEEN_MSGS);
-                            showInfo = true;
-                        }
-                        Thread.sleep(PAUSE_BETWEEEN_MSGS);
-                        if (showInfo) {
-                            System.out.println(
-                                    "Array size: " + chm.keySet().size()
-                                    + " msgs sent: " + msg
-                                    + " threads-created: " + threads_created
-                                    + " server up since: " + date);
-                            showInfo = false;
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-    }
 }
